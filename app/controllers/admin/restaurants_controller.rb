@@ -1,6 +1,7 @@
 class Admin::RestaurantsController < ApplicationController
   before_action :authenticate_user!
   before_action :authenticate_admin  
+  before_action :set_restaurant, only: [:show, :edit, :update]
 
   def index
     @restaurants = Restaurant.all
@@ -13,23 +14,31 @@ class Admin::RestaurantsController < ApplicationController
   def create
     @restaurant = Restaurant.new(restaurant_params)
     if @restaurant.save
-      flash[:notice] = "Restaurant was successfully created!" 
       redirect_to admin_restaurants_url
+      flash[:notice] = "Restaurant was successfully created!" 
     else
        render :action => :new
        flash[:alert] = "Restaurant was failed to create!"
     end
   end
 
-  def show
-    @restaurant = Restaurant.find(params[:id])
+
+  def update
+
+    if @restaurant.update(restaurant_params)
+      redirect_to admin_restaurant_path(@restaurant)
+      flash[:notice] = "Restaurant was successfully updateed!"
+    else
+      render :action => :edit
+      flash[:alert] = "Restaurant was failed to update!"
+    end
     
   end
 
   private
 
   def set_restaurant
-    @restaurants = Restaurant.find(params[:id])
+    @restaurant = Restaurant.find(params[:id])
   end
 
   def restaurant_params
